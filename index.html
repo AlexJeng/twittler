@@ -11,7 +11,6 @@
       body{
           background-color:white;
       }
-
       .container {
           width: 100%;
           max-height: 1000px;
@@ -23,21 +22,26 @@
           border-radius: 10px;
           -moz-border-radius: 10px;
           -webkit-border-radius: 10px;
-      }
-      .mainbody,
-      .header{
-          padding: 5px;
+          overflow: scroll;
+
       }
       .mainbody {
           margin-top: 0;
           min-height: 900px;
-          max-height: 1500px;
+          max-height: 90%;
+          padding-top: 10px;
+          background-color: #55ACEE
       }
       .header {
-          height: 40px;
-          border-bottom: 1px solid #EEE;
+          color: #55ACEE;
+          font-weight: bolder;
+          font-size: 20px;
+          font:Gotham;
+          border-bottom: 2px solid #EEE;
           background-color: #ffffff;
-          height: 40px;
+          padding-top: 50px;
+          padding-left: 20px;
+
           -webkit-border-top-left-radius: 5px;
           -webkit-border-top-right-radius: 5px;
           -moz-border-radius-topleft: 5px;
@@ -45,19 +49,20 @@
           border-top-left-radius: 5px;
           border-top-right-radius: 5px;
       }
-
       #messages{
           position: relative;
           background-color:#FFFFFF;
           font-size: 16px;
           font:Gotham;
           width: 750px;
-          margin-left: 300px;
+          margin-left: 25%;
           border: 1px solid gray;
-          
           padding: 10px;
           font-weight:bold;
-
+          -webkit-border-top-left-radius: 5px;
+          -webkit-border-top-right-radius: 5px;
+          -webkit-border-bottom-left-radius: 5px;
+          -webkit-border-bottom-right-radius: 5px;
       }
       span{
         font-weight:normal;
@@ -71,8 +76,8 @@
         list-style-type: none;
         font-weight:normal;
       }
-      
   </style>
+
   <body>
     <div class="container">
     <div class="header">Twittler</div>
@@ -82,18 +87,14 @@
     <script>
 
       $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
-        
-        
+
        function doubleDigit(i){ //adds a zero to the minutes if it's less than 10 to read better
          if(i < 10){
             i = "0" + i;
             }
          return i;
        }
-
-
+       
         setInterval(function(){
          //update();
          loadTweets();
@@ -102,7 +103,7 @@
         var oldIndex = 0;
         var newIndex = 0;
         var tempIndex;
-
+        
         var loadTweets = function(){
             var date = new Date();
 
@@ -126,15 +127,20 @@
             $tweet.text('@' + tweet.user);
             $time.text(': ' + checkTime + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 >= 1) ? 'PM':'AM'));
             $message.text(tweet.message);
-            $tweet.prependTo($body);
+            $tweet.prependTo($('.mainbody'));
             $time.appendTo($tweet);
             $message.appendTo($tweet);
 
             //work in progress, not working yet
-            if(streams.home.length > 100){ //if too many tweets start to fill the screen, delete some
-              $('body div:last').remove();
-            }
+            //if(streams.home.length > 20){ //if too many tweets start to fill the screen, delete some
+            //  $('#messages:last').remove();
+            //}
+
+            //increment index
             oldIndex += 1;
+
+            //$('#messages :even').css('background-color', '#252b30');
+
           }
         }
 
