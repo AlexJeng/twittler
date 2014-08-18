@@ -4,14 +4,49 @@
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
   </head>
-  <style>
+  <style type = "text/css">
       ul{
           list-style-type: none;
       }
       body{
           background-color:white;
       }
-      div{
+
+      .container {
+          width: 100%;
+          max-height: 1000px;
+          border: 1px solid #fff;
+          background-color: #ffffff;
+          box-shadow: 0px 2px 7px #292929;
+          -moz-box-shadow: 0px 2px 7px #292929;
+          -webkit-box-shadow: 0px 2px 7px #292929;
+          border-radius: 10px;
+          -moz-border-radius: 10px;
+          -webkit-border-radius: 10px;
+      }
+      .mainbody,
+      .header{
+          padding: 5px;
+      }
+      .mainbody {
+          margin-top: 0;
+          min-height: 900px;
+          max-height: 1500px;
+      }
+      .header {
+          height: 40px;
+          border-bottom: 1px solid #EEE;
+          background-color: #ffffff;
+          height: 40px;
+          -webkit-border-top-left-radius: 5px;
+          -webkit-border-top-right-radius: 5px;
+          -moz-border-radius-topleft: 5px;
+          -moz-border-radius-topright: 5px;
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
+      }
+
+      #messages{
           position: relative;
           background-color:#FFFFFF;
           font-size: 16px;
@@ -37,10 +72,13 @@
         font-weight:normal;
       }
       
-
   </style>
   <body>
-    <div class = "messages"></div>
+    <div class="container">
+    <div class="header">Twittler</div>
+    <div class="mainbody"></div>
+    </div>
+
     <script>
 
       $(document).ready(function(){
@@ -49,11 +87,9 @@
         
         
        function doubleDigit(i){ //adds a zero to the minutes if it's less than 10 to read better
-
          if(i < 10){
             i = "0" + i;
             }
-
          return i;
        }
 
@@ -69,26 +105,41 @@
 
         var loadTweets = function(){
             var date = new Date();
+
+            //setting index like this to load newer tweets at the top instead of the bottom
             newIndex = streams.home.length - 1 - oldIndex;
             tempIndex = newIndex;
-            console.log('oldIndex ' + oldIndex + 'newIndex ' + newIndex + 'tempIndex ' + tempIndex);
+
           while(streams.home.length - 1 > oldIndex){
             var tweet = streams.home[oldIndex];
-            var $tweet = $('<div></div>');
+            var $tweet = $('<div id ="messages"></div>');
             var $time = $('<span></span>');
             var $message = $('<li></li>');
+
+            //check the time to display it correctly, do not want to display 0 for Noon and Midnight
+            var checkTime = date.getHours()%12;
+            if(checkTime === 0){
+              checkTime = '12';
+            }
+
+            //add tweet, time, and username to tweet
             $tweet.text('@' + tweet.user);
-            $time.text(': ' + date.getHours()%12 + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 > 1) ? 'PM':'AM'));
+            $time.text(': ' + checkTime + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 >= 1) ? 'PM':'AM'));
             $message.text(tweet.message);
             $tweet.prependTo($body);
             $time.appendTo($tweet);
             $message.appendTo($tweet);
+
+            //work in progress, not working yet
             if(streams.home.length > 100){ //if too many tweets start to fill the screen, delete some
               $('body div:last').remove();
             }
             oldIndex += 1;
           }
         }
+
+
+
       });
 
     </script>
