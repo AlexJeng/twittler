@@ -76,78 +76,95 @@
         list-style-type: none;
         font-weight:normal;
       }
+      a:hover{
+        text-decoration: underline;
+      }
+      a.userName{
+        color: blue;
+      }
   </style>
 
   <body>
     <div class="container">
-    <div class="header">Twittler</div>
+    <div class="header">Twittler
+    <button class ="refreshTweets">Refresh Tweets</button>
+    <button class ="back">Go Back</button></div>
     <div class="mainbody"></div>
     </div>
 
+
+
     <script>
 
+      var oldIndex = 0;
+      var newIndex = 0;
+      var tempIndex;
+      var name;
+      var date = new Date();
+
+
       $(document).ready(function(){
+        loadTweets();
+        $('.header').on('click', 'button.refreshTweets', loadTweets);
+        $('a').click(function(){
+          //location.reload(); //need to refresh screen to display new tweets
+          loadTweets($(this).text()); 
+        });
+      });
 
-       function doubleDigit(i){ //adds a zero to the minutes if it's less than 10 to read better
-         if(i < 10){
-            i = "0" + i;
-            }
-         return i;
-       }
-       
-        setInterval(function(){
-         //update();
-         loadTweets();
-        }, 5000);
-
-        var oldIndex = 0;
-        var newIndex = 0;
-        var tempIndex;
-        
-        var loadTweets = function(){
-            var date = new Date();
+        var loadTweets = function(name){
+            console.log('name is ' + name); 
 
             //setting index like this to load newer tweets at the top instead of the bottom
             newIndex = streams.home.length - 1 - oldIndex;
             tempIndex = newIndex;
 
           while(streams.home.length - 1 > oldIndex){
-            var tweet = streams.home[oldIndex];
-            var $tweet = $('<div id ="messages"></div>');
+            var tweet;
+            var $tweet = $('<div class="msg" id="messages"></div>');
+            var $user = $('<a class="userName"></a>');
             var $time = $('<span></span>');
             var $message = $('<li></li>');
 
-            //check the time to display it correctly, do not want to display 0 for Noon and Midnight
-            var checkTime = date.getHours()%12;
-            if(checkTime === 0){
-              checkTime = '12';
+            if(name === undefined || typeof name === 'object'){
+               tweet = streams.home[oldIndex];
+               console.log('showSingleUserTweets is false');
+               $user.text(tweet.user);
             }
+            else {
+               tweet = streams.users[name][oldIndex];
+               console.log(tweet);
+               $user.text(name);
+            }
+            
+            $tweet.text('@');
+            $time.text(': ' + checkTime() + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 >= 1) ? 'PM':'AM'));
+            $message.text(tweet.message);
 
             //add tweet, time, and username to tweet
-            $tweet.text('@' + tweet.user);
-            $time.text(': ' + checkTime + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 >= 1) ? 'PM':'AM'));
-            $message.text(tweet.message);
-            $tweet.prependTo($('.mainbody'));
-            $time.appendTo($tweet);
-            $message.appendTo($tweet);
+              $tweet.prependTo($('.mainbody'));
+              $user.appendTo($tweet);
+              $time.appendTo($tweet);
+              $message.appendTo($tweet);
 
-            //work in progress, not working yet
-            //if(streams.home.length > 20){ //if too many tweets start to fill the screen, delete some
-            //  $('#messages:last').remove();
-            //}
-
-            //increment index
             oldIndex += 1;
-
-            //$('#messages :even').css('background-color', '#252b30');
-
           }
         }
 
+      function doubleDigit(i){ //adds a zero to the minutes if it's less than 10 to read better
+         if(i < 10){
+            i = "0" + i;
+            }
+         return i;
+       }
 
-
-      });
-
+       function checkTime(){
+        var time = date.getHours()%12;
+            if(time === 0){
+              time = '12';
+            }
+            return time;
+       }
     </script>
   </body>
 </html>
