@@ -23,7 +23,6 @@
           -moz-border-radius: 10px;
           -webkit-border-radius: 10px;
           overflow: scroll;
-
       }
       .mainbody {
           margin-top: 0;
@@ -93,17 +92,13 @@
     <div class="mainbody"></div>
     </div>
 
-
-
     <script>
-
       var oldIndex = 0;
       var oldIndex2 = 0;
       var newIndex = 0;
       var tempIndex;
       var namePassed = 0;
       var date = new Date();
-
 
       $(document).ready(function(){
         loadTweets();
@@ -114,16 +109,14 @@
           clearTweets();
           namePassed = $(this).text();
           loadTweets(namePassed); 
-        });
+          });
         }, 5000);
 
         $('.header').on('click', 'button.refreshTweets', function() {
           namePassed = 0;
           clearTweets();
           loadTweets(namePassed);
-
         });
-       
       });
 
         var loadTweets = function(name){
