@@ -93,113 +93,85 @@
     </div>
 
     <script>
-      var oldIndex = 0;
-      var oldIndex2 = 0;
-      var newIndex = 0;
-      var tempIndex;
-      var namePassed = 0;
-      var date = new Date();
+    var oldIndex = 0;
+    var newIndex = 0;
+    var tempIndex;
+    var date = new Date();
 
-      $(document).ready(function(){
-        loadTweets();
-  
-        setInterval(function(){
-        loadTweets(namePassed);
-         $('a').click(function(){
-          clearTweets();
-          namePassed = $(this).text();
-          loadTweets(namePassed); 
-          });
-        }, 5000);
-
-        $('.header').on('click', 'button.refreshTweets', function() {
-          namePassed = 0;
-          clearTweets();
-          loadTweets(namePassed);
-        });
-      });
-
-        var loadTweets = function(name){
-           
-            console.log('name is ' + name); 
-
-            //setting index like this to load newer tweets at the top instead of the bottom
-            newIndex = streams.home.length - 1 - oldIndex;
-            tempIndex = newIndex;
-
-            if(name === undefined || name === 0){ //if no name was passed in, show all tweets
-               while(streams.home.length - 1 > oldIndex){                           
-                 var tweet;   //There is probably a better way to write this
-                 var $tweet = $('<div class="msg" id="messages"></div>');
-                 var $user = $('<a class="userName"></a>');
-                 var $time = $('<span></span>');
-                 var $message = $('<li></li>');
-
-                 tweet = streams.home[oldIndex];
-                 console.log('name is not defined');
-                 $user.text(tweet.user);
-                 $message.text(tweet.message);
-                 $tweet.text('@');
-                 $time.text(': ' + checkTime() + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 >= 1) ? 'PM':'AM'));
-
-                 //add tweet, time, and username to tweet
-                 $tweet.prependTo($('.mainbody'));
-                 $user.appendTo($tweet);
-                 $time.appendTo($tweet);
-                 $message.appendTo($tweet);
-                  oldIndex += 1;
-              }
-            }
-            else {  
-               while(streams.users[name].length -1 > oldIndex2)   {  
-                 var tweet;
-                 var $tweet = $('<div class="msg" id="messages"></div>');
-                 var $user = $('<a class="userName"></a>');
-                 var $time = $('<span></span>');
-                 var $message = $('<li></li>');                                       //otherwise load tweets from user
-                 tweet = streams.users[name];
-                 $user.text(name);
-                 console.log(streams.users[name]);
-                 $message.text(streams.users[name][oldIndex2].message);
-                 $tweet.text('@');
-                 $time.text(': ' + checkTime() + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 >= 1) ? 'PM':'AM'));
-
-                //add tweet, time, and username to tweet
-                 $tweet.prependTo($('.mainbody'));
-                 $user.appendTo($tweet);
-                 $time.appendTo($tweet);
-                 $message.appendTo($tweet);
-                 oldIndex2 += 1;
-               }
-            }
-             console.log('removing message' + $('.mainbody div').length );
-          while($('.mainbody div').length > 10){ //If there are too many tweets, delete some of them from the DOM
-
-            $('.mainbody div:last').remove();
-          }
+    var loadTweets = function(name) {
+      newIndex = name.length - (oldIndex + 1);
+      tempIndex = newIndex;
+      
+      while (name.length - 1 > oldIndex) {
+        var tweet = name[oldIndex];
+        var $tweet = $('<div class="msg" id="messages"></div>');
+        var $user = $('<a class="userName"></a>');
+        var $time = $('<span></span>');
+        var $message = $('<li></li>');
+      
+        $user.text(tweet.user);
+        $message.text(tweet.message);
+        $tweet.text('@');
+        $time.text(': ' + checkTime() + ':' + doubleDigit(date.getMinutes()) + ((date.getHours()/12 >= 1) ? 'PM':'AM'));
+        
+        $tweet.prependTo($('.mainbody'));
+        $user.appendTo($tweet);
+        $time.appendTo($tweet);
+        $message.appendTo($tweet);
+        oldIndex++;
+        
+        if ($('.mainbody div').length > 10) {
+          $('.mainbody div:last').remove();
         }
-
-      function clearTweets(){ 
-        $('.mainbody').html('');
-        oldIndex = 0;
-        oldIndex2 = 0;
-        newIndex = 0;
       }
+    }
 
-      function doubleDigit(i){ //adds a zero to the minutes if it's less than 10 to read better
-         if(i < 10){
-            i = "0" + i;
-            }
-         return i;
-       }
+    function clearTweets(){ 
+      $('.mainbody').html('');
+      oldIndex = 0;
+      newIndex = 0;
+    }
 
-       function checkTime(){
-        var time = date.getHours()%12;
-            if(time === 0){
-              time = '12';
-            }
-            return time;
-       }
+    function doubleDigit(i) {
+      return i < 10 ? "0" + i : i;
+    }
+
+    function checkTime() {
+      var time = date.getHours()%12;
+      return time === 0 ? '12' : time;
+    }
+
+    $(document).ready(function(){
+    loadTweets(streams.home); 
+
+    var tweetInterval = setInterval(function(){
+      clearTweets();
+      loadTweets(streams.home);
+    }, 3000);
+
+    $('.mainbody').on('click', 'a', function(){
+      var namePassed = $(this).text();
+      clearInterval(tweetInterval);
+      
+      clearTweets();
+      loadTweets(streams.users[namePassed]);
+      tweetInterval = setInterval(function() {
+        clearTweets();
+        loadTweets(streams.users[namePassed]);
+      }, 3000);
+    });
+
+    $('.header').on('click', 'button.refreshTweets', function() {
+      clearInterval(tweetInterval); 
+      clearTweets();
+      loadTweets(streams.home);
+      
+      tweetInterval = setInterval(function() {
+        clearTweets();
+        loadTweets(streams.home);
+      }, 3000);
+    });
+  });
     </script>
   </body>
 </html>
